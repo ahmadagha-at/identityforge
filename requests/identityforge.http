@@ -1,0 +1,64 @@
+@authServer = http://127.0.0.1:9000
+@clientApp = http://127.0.0.1:8081
+@clientId = identityforge-client
+@clientSecret = change-this-client-secret
+@accessToken = replace-with-access-token
+@refreshToken = replace-with-refresh-token
+@csrfToken = replace-with-csrf-token
+@sessionCookie = replace-with-session-cookie
+
+### Client home controller
+GET {{clientApp}}/
+
+### Protected client profile (redirects without a client session)
+GET {{clientApp}}/profile
+
+### Start the interactive Authorization Code + PKCE flow
+GET {{clientApp}}/oauth2/authorization/identityforge
+
+### Authorization-server login controller
+GET {{authServer}}/login
+
+### Authorization-server registration controller
+GET {{authServer}}/register
+
+### Register a user
+# First load /register and copy the CSRF token and session cookie.
+POST {{authServer}}/register
+Cookie: JSESSIONID={{sessionCookie}}
+Content-Type: application/x-www-form-urlencoded
+
+username=alice&email=alice%40example.com&password=a-secure-password&_csrf={{csrfToken}}
+
+### OIDC discovery
+GET {{authServer}}/.well-known/openid-configuration
+
+### Authorization server metadata
+GET {{authServer}}/.well-known/oauth-authorization-server
+
+### Public signing keys
+GET {{authServer}}/oauth2/jwks
+
+### UserInfo protected API
+GET {{authServer}}/userinfo
+Authorization: Bearer {{accessToken}}
+
+### Rotate a refresh token
+POST {{authServer}}/oauth2/token
+Authorization: Basic {{clientId}} {{clientSecret}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token&refresh_token={{refreshToken}}
+
+### Revoke a refresh token
+POST {{authServer}}/oauth2/revoke
+Authorization: Basic {{clientId}} {{clientSecret}}
+Content-Type: application/x-www-form-urlencoded
+
+token={{refreshToken}}&token_type_hint=refresh_token
+
+### Invalid redirect URI must be rejected
+GET {{authServer}}/oauth2/authorize?response_type=code&client_id={{clientId}}&scope=openid%20profile&redirect_uri=http://attacker.example/callback&state=invalid-redirect-test&code_challenge=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&code_challenge_method=S256
+
+### Missing PKCE challenge must be rejected
+GET {{authServer}}/oauth2/authorize?response_type=code&client_id={{clientId}}&scope=openid%20profile&redirect_uri=http://127.0.0.1:8081/login/oauth2/code/identityforge&state=missing-pkce-test

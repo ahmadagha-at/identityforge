@@ -1,0 +1,15 @@
+alter table oauth2_authorization
+alter column attributes type text using convert_from(attributes, 'UTF8'),
+    alter column authorization_code_value type text using convert_from(authorization_code_value, 'UTF8'),
+    alter column authorization_code_metadata type text using convert_from(authorization_code_metadata, 'UTF8'),
+    alter column access_token_value type text using convert_from(access_token_value, 'UTF8'),
+    alter column access_token_metadata type text using convert_from(access_token_metadata, 'UTF8'),
+    alter column oidc_id_token_value type text using convert_from(oidc_id_token_value, 'UTF8'),
+    alter column oidc_id_token_metadata type text using convert_from(oidc_id_token_metadata, 'UTF8'),
+    alter column oidc_id_token_claims type text using convert_from(oidc_id_token_claims, 'UTF8'),
+    alter column refresh_token_value type text using convert_from(refresh_token_value, 'UTF8'),
+    alter column refresh_token_metadata type text using convert_from(refresh_token_metadata, 'UTF8'),
+    alter column user_code_value type text using convert_from(user_code_value, 'UTF8'),
+    alter column user_code_metadata type text using convert_from(user_code_metadata, 'UTF8'),
+    alter column device_code_value type text using convert_from(device_code_value, 'UTF8'),
+    alter column device_code_metadata type text using convert_from(device_code_metadata, 'UTF8');

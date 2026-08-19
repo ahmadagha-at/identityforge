@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="utf-8"><title>IdentityForge Profile</title></head>
+<body>
+<main>
+  <h1>Protected profile</h1>
+  <p>Authenticated subject: <code th:text="${subject}"></code></p>
+  <section>
+    <h2>ID Token claims</h2>
+    <p>These claims authenticated the user in the client application.</p>
+    <pre th:text="${idTokenClaims}"></pre>
+  </section>
+  <section>
+    <h2>UserInfo response</h2>
+    <p>The client fetched this data from the authorization server with the access token.</p>
+    <pre th:text="${userInfo}"></pre>
+  </section>
+  <a href="/">Back</a>
+</main>
+</body>
+</html>

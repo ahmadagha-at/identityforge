@@ -1,0 +1,55 @@
+server:
+  port: 9000
+  forward-headers-strategy: framework
+  servlet:
+    session:
+      cookie:
+        name: AUTHSESSIONID
+        http-only: true
+        same-site: lax
+
+spring:
+  application:
+    name: identityforge-auth-server
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/identityforge_auth}
+    username: ${DB_USERNAME:identityforge}
+    password: ${DB_PASSWORD:change-me-auth}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+  thymeleaf:
+    cache: false
+
+identityforge:
+  issuer: ${AUTH_ISSUER:http://127.0.0.1:9000}
+  jwk-file: ${JWK_FILE:./keys/identityforge-jwk.json}
+  bootstrap:
+    admin-username: ${ADMIN_USERNAME:admin}
+    admin-email: ${ADMIN_EMAIL:admin@identityforge.local}
+    admin-password: ${ADMIN_PASSWORD:change-this-admin-password}
+    client-app-secret: ${CLIENT_APP_SECRET:change-this-client-secret}
+  security:
+    maximum-login-attempts: 5
+    lock-duration: 15m
+    token-endpoint-capacity: 30
+    token-endpoint-refill-period: 1m
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    dev.identityforge: DEBUG
+

@@ -1,0 +1,39 @@
+server:
+  port: 8081
+  servlet:
+    session:
+      cookie:
+        name: CLIENTSESSIONID
+        http-only: true
+        same-site: lax
+
+spring:
+  application:
+    name: identityforge-client-app
+  security:
+    oauth2:
+      client:
+        registration:
+          identityforge:
+            provider: identityforge
+            client-id: identityforge-client
+            client-secret: ${CLIENT_APP_SECRET:change-this-client-secret}
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: [openid,profile]
+        provider:
+          identityforge:
+            authorization-uri: ${AUTH_ISSUER:http://127.0.0.1:9000}/oauth2/authorize
+            token-uri: ${AUTH_INTERNAL_BASE_URL:${AUTH_ISSUER:http://127.0.0.1:9000}}/oauth2/token
+            jwk-set-uri: ${AUTH_INTERNAL_BASE_URL:${AUTH_ISSUER:http://127.0.0.1:9000}}/oauth2/jwks
+            user-info-uri: ${AUTH_INTERNAL_BASE_URL:${AUTH_ISSUER:http://127.0.0.1:9000}}/userinfo
+            user-name-attribute: sub
+management:
+  endpoints.web.exposure.include: health,info
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    dev.identityforge: DEBUG
+

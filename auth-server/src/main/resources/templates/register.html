@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="utf-8"><title>Create IdentityForge Account</title></head>
+<body>
+<main>
+  <h1>Create account</h1>
+  <form method="post" th:action="@{/register}" th:object="${registration}">
+    <label>Username <input th:field="*{username}" required></label>
+    <div th:errors="*{username}"></div><br>
+    <label>Email <input type="email" th:field="*{email}" required></label>
+    <div th:errors="*{email}"></div><br>
+    <label>Password <input type="password" th:field="*{password}" required minlength="12"></label>
+    <div th:errors="*{password}"></div><br>
+    <button type="submit">Register</button>
+  </form>
+  <a th:href="@{/login}">Back to sign in</a>
+</main>
+</body>
+</html>
+

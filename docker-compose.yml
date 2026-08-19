@@ -1,0 +1,56 @@
+services:
+  auth-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${AUTH_DB_NAME}
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${AUTH_DB_USER} -d ${AUTH_DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+
+  auth-server:
+    build:
+      context: .
+      dockerfile: auth-server/Dockerfile
+    environment:
+      DB_URL: jdbc:postgresql://auth-db:5432/${AUTH_DB_NAME}
+      DB_USERNAME: ${AUTH_DB_USER}
+      DB_PASSWORD: ${AUTH_DB_PASSWORD}
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      CLIENT_APP_SECRET: ${CLIENT_APP_SECRET}
+      AUTH_ISSUER: ${AUTH_ISSUER}
+      JWK_FILE: /app/keys/identityforge-jwk.json
+    ports:
+      - "9000:9000"
+    volumes:
+      - signing-keys:/app/keys
+    depends_on:
+      auth-db:
+        condition: service_healthy
+
+  client-app:
+    build:
+      context: .
+      dockerfile: client-app/Dockerfile
+    environment:
+      AUTH_ISSUER: ${AUTH_ISSUER}
+      AUTH_INTERNAL_BASE_URL: http://auth-server:9000
+      CLIENT_APP_SECRET: ${CLIENT_APP_SECRET}
+    ports:
+      - "8081:8081"
+    depends_on:
+      auth-server:
+        condition: service_started
+
+volumes:
+  auth-db-data:
+  signing-keys:

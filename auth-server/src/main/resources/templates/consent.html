@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="utf-8"><title>Authorize Client</title></head>
+<body>
+<main>
+  <h1>Authorize access</h1>
+  <p><strong th:text="${clientName}">Client</strong> requests access to your account.</p>
+  <p>Signed in as <span th:text="${principalName}">user</span>.</p>
+  <form method="post" action="/oauth2/authorize">
+    <input type="hidden" name="client_id" th:value="${clientId}">
+    <input type="hidden" name="state" th:value="${state}">
+    <input type="hidden" name="consent_action" value="approve">
+    <div th:each="scope : ${scopes}">
+      <label><input type="checkbox" name="scope" th:value="${scope}" checked>
+        <span th:text="${scope}">scope</span></label>
+    </div>
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    <button type="submit">Allow selected permissions</button>
+  </form>
+  <form method="post" action="/oauth2/authorize">
+    <input type="hidden" name="client_id" th:value="${clientId}">
+    <input type="hidden" name="state" th:value="${state}">
+    <input type="hidden" name="consent_action" value="cancel">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    <button type="submit">Deny</button>
+  </form>
+</main>
+</body>
+</html>

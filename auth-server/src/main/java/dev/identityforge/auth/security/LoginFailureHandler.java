@@ -1,0 +1,28 @@
+package dev.identityforge.auth.security;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.stereotype.Component;
+
+@Component
+public class LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
+    private final LoginAttemptService attempts;
+
+    public LoginFailureHandler(LoginAttemptService attempts) {
+        super("/login?error");
+        this.attempts = attempts;
+    }
+
+    @Override
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+                                        AuthenticationException exception)
+            throws IOException, ServletException {
+        attempts.failed(request.getParameter("username"), request.getRemoteAddr());
+        super.onAuthenticationFailure(request, response, exception);
+    }
+}
+
